@@ -1,7 +1,7 @@
 import axios from "axios";
 import { create } from "zustand";
 
-const API_URL = "http://54.242.107.79:8000/api/termsAndConditions";
+const API_URL = "https://vailovent.my.id/api/termsAndConditions";
 
 export const useTermsAndConditionsStore = create((set) => ({
   termsAndConditions: [], // Default empty array agar tidak error
