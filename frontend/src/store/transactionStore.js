@@ -2,9 +2,10 @@ import { create } from "zustand";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const API_URL = "http://3.80.235.113:8000/api/transaction";
-const MIDTRANS_URL = "http://3.80.235.113:8000/api/midtrans/create-transaction";
-const GET_PAYMENT_API = "http://3.80.235.113:8000/api/transaction/get-by-id";
+const API_URL = "http://54.242.107.79:8000/api/transaction";
+const MIDTRANS_URL =
+  "http://54.242.107.79:8000/api/midtrans/create-transaction";
+const GET_PAYMENT_API = "http://54.242.107.79:8000/api/transaction/get-by-id";
 
 export const useTransactionStore = create((set, get) => ({
   table_code: "",
