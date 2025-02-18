@@ -6,6 +6,10 @@ const API_URL = "https://vailovent.my.id/api/transaction";
 const MIDTRANS_URL = "https://vailovent.my.id/api/midtrans/create-transaction";
 const GET_PAYMENT_API = "https://vailovent.my.id/api/transaction/get-by-id";
 
+// const API_URL = "http://localhost:8000/api/transaction";
+// const MIDTRANS_URL = "http://localhost:8000/api/midtrans/create-transaction";
+// const GET_PAYMENT_API = "http://localhost:8000/api/transaction/get-by-id";
+
 export const useTransactionStore = create((set, get) => ({
   table_code: "",
   customer_name: "",
@@ -150,6 +154,45 @@ export const useTransactionStore = create((set, get) => ({
       toast.error(errorMessage);
       set({ error: errorMessage, isLoading: false });
       throw error;
+    }
+  },
+
+  clearTransactions: () => set({ transactions: [] }),
+
+  fetchAllTransactionByStatus: async (status) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      if (!status) {
+        throw new Error("Status is required!");
+      }
+
+      const response = await axios.get(`${API_URL}/${status}`);
+      if (!response?.data) {
+        throw new Error("Invalid response format");
+      }
+
+      const { success, message, data } = response.data;
+
+      if (!success) {
+        throw new Error(message || "Failed to fetch transactions");
+      }
+
+      set({
+        transactions: data.Transactions,
+        transactionItems: data.TransactionItems,
+        isLoading: false,
+      });
+
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Error fetching transactions";
+      toast.error(errorMessage);
+      set({ error: errorMessage, isLoading: false });
+      // throw error;
     }
   },
 }));

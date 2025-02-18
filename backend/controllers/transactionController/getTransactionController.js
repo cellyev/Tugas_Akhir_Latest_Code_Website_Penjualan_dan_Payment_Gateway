@@ -2,6 +2,7 @@ const axios = require("axios");
 const Transactions = require("../../models/transactionSchema");
 const TransactionItems = require("../../models/transactionItemSchema");
 const mongoose = require("mongoose");
+const Transaction = require("midtrans-client/lib/transaction");
 
 exports.getById = async (req, res) => {
   const { transaction_id } = req.params;
@@ -25,13 +26,6 @@ exports.getById = async (req, res) => {
       });
     }
 
-    // if (["completed", "cancelled"].includes(existingTransaction.status)) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: `Transaction is already ${existingTransaction.status}`,
-    //     data: null,
-    //   });
-    // }
     const existingTransactionItems = await TransactionItems.find({
       transaction_id,
     });
@@ -109,6 +103,98 @@ exports.getById = async (req, res) => {
       success: false,
       message: "An internal server error occurred",
       data: null,
+    });
+  }
+};
+
+exports.getAllTransactionByStatus = async (req, res) => {
+  const { status } = req.params;
+
+  if (!status) {
+    return res.status(400).json({
+      success: false,
+      message: "Status parameter is required",
+      data: null,
+    });
+  }
+
+  try {
+    const transactions = await Transactions.find({ status }).sort({
+      createdAt: -1,
+    });
+
+    if (!transactions || transactions.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No transactions found with status '${status}'`,
+        data: [],
+      });
+    }
+    const transactionItems = await TransactionItems.find({
+      transaction_id: {
+        $in: transactions.map((transaction) => transaction.id),
+      },
+    });
+    if (!transactionItems) {
+      return res.status(404).json({
+        success: false,
+        message: "No transaction items found",
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Transactions with status '${status}' successfully retrieved`,
+      data: {
+        Transactions: transactions,
+        TransactionItems: transactionItems,
+      },
+    });
+  } catch (error) {
+    console.error("Error in getAllTransactionByStatus:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "An internal server error occurred",
+      error: error.message,
+    });
+  }
+};
+
+exports.getAllTransactions = async (req, res) => {
+  try {
+    const transactions = await Transactions.find({});
+    if (!transactions || transactions.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No transactions found",
+        data: null,
+      });
+    }
+
+    const transactionItems = await TransactionItems.find({
+      transaction_id: transactions.map((transaction) => transaction.id),
+    });
+
+    if (!transactionItems) {
+      return res.status(404).json({
+        success: false,
+        message: "No transaction items found",
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Transactions successfully retrieved",
+      data: transactions,
+    });
+  } catch (error) {
+    console.error("Error in getAllTransactions:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "An internal server error occurred",
+      error: error.message,
     });
   }
 };

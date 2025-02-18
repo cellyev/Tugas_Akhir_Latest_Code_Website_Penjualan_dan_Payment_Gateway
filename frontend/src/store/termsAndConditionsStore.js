@@ -1,10 +1,11 @@
 import axios from "axios";
 import { create } from "zustand";
 
-const API_URL = "https://vailovent.my.id/api/termsAndConditions";
+const API_URL = "https://vailobent.my.id/api/termsAndConditions";
+// const API_URL = "http://localhost:8000/api/termsAndConditions";
 
 export const useTermsAndConditionsStore = create((set) => ({
-  termsAndConditions: [], // Default empty array agar tidak error
+  termsAndConditions: [],
   error: null,
   isLoading: false,
 
@@ -13,7 +14,7 @@ export const useTermsAndConditionsStore = create((set) => ({
     try {
       const response = await axios.get(API_URL);
       set({
-        termsAndConditions: response.data.data, // Pastikan mengambil data yang benar
+        termsAndConditions: response.data.data,
         isLoading: false,
       });
     } catch (error) {

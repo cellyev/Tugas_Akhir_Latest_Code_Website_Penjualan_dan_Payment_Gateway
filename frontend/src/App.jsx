@@ -8,18 +8,17 @@ import TermsAndConditionsModal from "./components/TermsAndConditionsModal";
 export default function App() {
   const [termsAccepted, setTermsAccepted] = useState(false);
 
-  // Cek status terms yang diterima
   useEffect(() => {
-    const hasAcceptedTerms = sessionStorage.getItem("hasAcceptedTerms"); // Menggunakan sessionStorage
-    console.log("hasAcceptedTerms on load:", hasAcceptedTerms); // Log untuk memastikan status
+    const hasAcceptedTerms = sessionStorage.getItem("hasAcceptedTerms");
+    console.log("hasAcceptedTerms on load:", hasAcceptedTerms);
     if (hasAcceptedTerms === "true") {
       setTermsAccepted(true);
     }
   }, []);
 
   const handleAcceptTerms = () => {
-    sessionStorage.setItem("hasAcceptedTerms", "true"); // Simpan status di sessionStorage
-    setTermsAccepted(true); // Perbarui status aplikasi
+    sessionStorage.setItem("hasAcceptedTerms", "true");
+    setTermsAccepted(true);
   };
 
   return (
@@ -27,7 +26,6 @@ export default function App() {
       <ToastContainer />
       <Navbar />
       <div className="flex-grow">
-        {/* Tampilkan Terms & Conditions modal jika belum diterima */}
         {!termsAccepted && (
           <TermsAndConditionsModal onAccept={handleAcceptTerms} />
         )}
