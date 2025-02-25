@@ -198,3 +198,37 @@ exports.getAllTransactions = async (req, res) => {
     });
   }
 };
+
+exports.getTransactionBySuccessAndIsRead = async (req, res) => {
+  try {
+    const transaction = await Transactions.find({
+      status: "completed",
+      isRead: false,
+    });
+
+    if (!transaction || transaction.length === 0) {
+      return;
+      return res.status(400).json({
+        success: false,
+        message: "No transaction found",
+        data: null,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Transactions successfully retrieved",
+      data: transaction,
+    });
+  } catch (error) {
+    console.error(
+      "Error in getAllTransactionBySuccessAndIsRead:",
+      error.message
+    );
+    return res.status(500).json({
+      success: false,
+      message: "An internal server error occurred",
+      error: error.message,
+    });
+  }
+};

@@ -167,7 +167,7 @@ export const useTransactionStore = create((set, get) => ({
         throw new Error("Status is required!");
       }
 
-      const response = await axios.get(`${API_URL}/${status}`);
+      const response = await axios.get(`${API_URL}/get-by-status/${status}`);
       if (!response?.data) {
         throw new Error("Invalid response format");
       }
