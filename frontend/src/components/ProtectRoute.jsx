@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 
 export default function ProtectedRoute({ children }) {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
 
   useEffect(() => {
     const token = Cookies.get("Authorization");
@@ -15,8 +15,8 @@ export default function ProtectedRoute({ children }) {
     }
   }, [navigate]);
 
-  if (!isAuthenticated) {
-    return null;
+  if (isAuthenticated === null) {
+    return <div className="text-center mt-10 text-gray-600">Loading...</div>;
   }
 
   return children;
