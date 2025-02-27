@@ -4,6 +4,8 @@ import CartPage from "../pages/CartPage";
 import PaymentSuccessPage from "../pages/PaymentSuccessPage";
 import PaymentFailedPage from "../pages/paymentFailedPage";
 import PaymentHistoryPage from "../pages/PaymentHistoryPage";
+import SignInPage from "../pages/SignInPage";
+import ProtectedRoute from "../components/ProtectRoute";
 
 export default function RouterComponent() {
   return (
@@ -12,11 +14,25 @@ export default function RouterComponent() {
       <Route path="/cart" element={<CartPage />} />
       <Route path="/payment-success" element={<PaymentSuccessPage />} />
       <Route path="/payment-failed" element={<PaymentFailedPage />} />
-      <Route path="/admin/transaction" element={<PaymentHistoryPage />} />
+      <Route path="/admin/signin" element={<SignInPage />} />
+
+      <Route
+        path="/admin/transaction"
+        element={
+          <ProtectedRoute>
+            <PaymentHistoryPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/admin/transaction/:status"
-        element={<PaymentHistoryPage />}
+        element={
+          <ProtectedRoute>
+            <PaymentHistoryPage />
+          </ProtectedRoute>
+        }
       />
+
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );

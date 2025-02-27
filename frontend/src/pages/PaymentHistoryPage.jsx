@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PaymentHistory from "../components/PaymentHistory";
+import { useAuthStore } from "../store/authStore"; // Import auth store
 
 export default function PaymentHistoryPage() {
   const navigate = useNavigate();
   const { status } = useParams();
   const [selectedStatus, setSelectedStatus] = useState(status || "completed");
+  const { signout } = useAuthStore(); // Ambil fungsi signout dari store
 
   const statusOptions = [
     { label: "Pending", value: "pending" },
@@ -30,11 +32,23 @@ export default function PaymentHistoryPage() {
     }
   };
 
+  // Fungsi untuk logout
+  const handleLogout = async () => {
+    await signout();
+    navigate("/admin/signin");
+  };
+
   return (
     <div className="container mx-auto px-6 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 text-center mb-6">
-        Payment History
-      </h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">Payment History</h1>
+        <button
+          onClick={handleLogout}
+          className="px-6 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition"
+        >
+          Logout
+        </button>
+      </div>
 
       {/* Pilihan status transaksi */}
       <div className="flex flex-wrap justify-center gap-4 mb-8">

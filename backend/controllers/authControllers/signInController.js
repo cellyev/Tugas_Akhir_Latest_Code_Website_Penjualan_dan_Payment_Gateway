@@ -27,7 +27,7 @@ exports.SignIn = async (req, res) => {
     if (!existingUser) {
       return res.status(401).json({
         success: false,
-        message: "Invalid username or password",
+        message: "Invalid username or password!",
         data: null,
       });
     }
@@ -39,7 +39,7 @@ exports.SignIn = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials!",
+        message: "Invalid username or password!",
         data: {},
       });
     }
@@ -54,7 +54,7 @@ exports.SignIn = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Logged in successfully",
+      message: "Logged in successfully!",
       token,
       data: existingUser,
     });

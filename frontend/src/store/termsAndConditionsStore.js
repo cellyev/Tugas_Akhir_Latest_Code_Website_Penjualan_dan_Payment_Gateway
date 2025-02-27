@@ -1,8 +1,8 @@
 import axios from "axios";
 import { create } from "zustand";
 
-const API_URL = "https://vailovent.my.id/api/termsAndConditions";
-// const API_URL = "http://localhost:8000/api/termsAndConditions";
+// const API_URL = "https://vailovent.my.id/api/termsAndConditions";
+const API_URL = "http://localhost:8000/api/termsAndConditions";
 
 export const useTermsAndConditionsStore = create((set) => ({
   termsAndConditions: [],

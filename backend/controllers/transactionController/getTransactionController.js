@@ -207,7 +207,6 @@ exports.getTransactionBySuccessAndIsRead = async (req, res) => {
     });
 
     if (!transaction || transaction.length === 0) {
-      return;
       return res.status(400).json({
         success: false,
         message: "No transaction found",

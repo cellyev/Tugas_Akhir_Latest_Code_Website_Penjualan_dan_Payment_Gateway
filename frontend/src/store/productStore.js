@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL = "https://vailovent.my.id/api/product";
-// const API_URL = "http://localhost:8000/api/product";
+// const API_URL = "https://vailovent.my.id/api/product";
+const API_URL = "http://localhost:8000/api/product";
 
 export const useProductStore = create((set) => ({
   products: [],

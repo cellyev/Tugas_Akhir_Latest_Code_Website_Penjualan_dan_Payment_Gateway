@@ -21,6 +21,7 @@ app.use("/api/product", productRoute);
 app.use("/api/transaction", transactionRoute);
 app.use("/api/termsAndConditions", termsAndConditionsRoute);
 app.use("/api/midtrans", midtransRoute);
+app.use("/api/auth", authRoute);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));

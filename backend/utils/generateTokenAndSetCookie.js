@@ -1,19 +1,29 @@
 const jwt = require("jsonwebtoken");
 
 exports.generateTokenAndSetCookie = (res, userId, username) => {
-  const expiresIn = 7 * 24 * 60 * 60; // 7 hari dalam detik
+  const token = jwt.sign(
+    {
+      userId,
+      username,
+    },
+    process.env.JWT_SECRET_KEY,
+    { expiresIn: "7d" }
+  );
 
-  const token = jwt.sign({ userId, username }, process.env.JWT_SECRET_KEY, {
-    expiresIn,
-    algorithm: "HS256", // Menentukan algoritma eksplisit
-  });
-
+  // Jika sudah production
   res.cookie("Authorization", token, {
-    maxAge: expiresIn * 1000, // 7 hari dalam milidetik
-    httpOnly: true, // Melindungi dari XSS
-    secure: process.env.NODE_ENV === "production", // Hanya HTTPS di production
-    sameSite: "strict", // Lebih aman untuk mencegah CSRF
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    httpOnly: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
   });
 
-  return token; // Mengembalikan token jika dibutuhkan
+  // Jika masih development
+  // res.cookie("Authorization", token, {
+  //   path: "/",
+  //   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 hari
+  //   httpOnly: false, // Jangan httpOnly di mode development agar bisa diakses dari frontend
+  //   secure: false, // Jangan secure di mode development agar bisa berjalan di http (bukan https)
+  //   sameSite: "lax", // Agar cookie bisa digunakan dengan frontend berbeda origin
+  // });
 };
