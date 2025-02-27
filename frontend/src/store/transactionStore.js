@@ -2,13 +2,13 @@ import { create } from "zustand";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-// const API_URL = "https://vailovent.my.id/api/transaction";
-// const MIDTRANS_URL = "https://vailovent.my.id/api/midtrans/create-transaction";
-// const GET_PAYMENT_API = "https://vailovent.my.id/api/transaction/get-by-id";
+const API_URL = "https://vailovent.my.id/api/transaction";
+const MIDTRANS_URL = "https://vailovent.my.id/api/midtrans/create-transaction";
+const GET_PAYMENT_API = "https://vailovent.my.id/api/transaction/get-by-id";
 
-const API_URL = "http://localhost:8000/api/transaction";
-const MIDTRANS_URL = "http://localhost:8000/api/midtrans/create-transaction";
-const GET_PAYMENT_API = "http://localhost:8000/api/transaction/get-by-id";
+// const API_URL = "http://localhost:8000/api/transaction";
+// const MIDTRANS_URL = "http://localhost:8000/api/midtrans/create-transaction";
+// const GET_PAYMENT_API = "http://localhost:8000/api/transaction/get-by-id";
 
 export const useTransactionStore = create((set, get) => ({
   table_code: "",
