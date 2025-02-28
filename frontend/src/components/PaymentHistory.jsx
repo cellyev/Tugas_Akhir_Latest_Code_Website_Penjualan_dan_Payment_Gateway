@@ -5,15 +5,14 @@ import { toast } from "react-toastify";
 export default function PaymentHistory({ status }) {
   const {
     fetchAllTransactionByStatus,
-    transactions = [], // Ensure transactions is always an array
+    transactions = [],
     transactionItems = [],
     isLoading,
     error,
-    clearTransactions, // Function to clear previous transactions when the status changes
+    clearTransactions,
   } = useTransactionStore();
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
-  // Fetch transactions based on the selected status
   const fetchTransactions = useCallback(async () => {
     if (!status) return;
     try {
@@ -24,17 +23,13 @@ export default function PaymentHistory({ status }) {
   }, [status, fetchAllTransactionByStatus]);
 
   useEffect(() => {
-    // Clear previous transactions when status changes
     clearTransactions();
-
-    // Fetch transactions for the selected status
     fetchTransactions();
   }, [status, fetchTransactions, clearTransactions]);
 
-  // Safe currency formatting function
   const formatCurrency = (amount) => {
     if (typeof amount !== "number" || isNaN(amount)) {
-      return "Rp 0"; // Prevent errors if amount is undefined or null
+      return "Rp 0";
     }
     return amount.toLocaleString("id-ID", {
       style: "currency",
@@ -42,7 +37,6 @@ export default function PaymentHistory({ status }) {
     });
   };
 
-  // Date formatting function
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -56,33 +50,26 @@ export default function PaymentHistory({ status }) {
   };
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      {/* If loading */}
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {isLoading && (
         <p className="text-center text-gray-500">Loading transactions...</p>
       )}
-
-      {/* If error */}
       {error && <p className="text-center text-red-500">{error}</p>}
-
-      {/* If no transactions */}
       {!isLoading && transactions.length === 0 && !error && (
         <p className="text-center text-gray-500">
           No transactions found for the selected status.
         </p>
       )}
-
-      {/* List of transactions */}
       {!isLoading && transactions.length > 0 && (
         <div className="space-y-6">
           {transactions.map((transaction) => (
             <div
               key={transaction._id}
-              className="p-6 bg-white shadow-lg rounded-lg border border-gray-200"
+              className="p-4 sm:p-6 bg-white shadow-lg rounded-lg border border-gray-200"
             >
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-800">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
                     Transaction ID: {transaction._id}
                   </h2>
                   <p className="text-gray-600">
@@ -106,7 +93,6 @@ export default function PaymentHistory({ status }) {
                   >
                     Status: {transaction.status}
                   </p>
-                  {/* Transaction creation date */}
                   <p className="text-gray-500">
                     Created At: {formatDate(transaction.createdAt)}
                   </p>
@@ -119,22 +105,18 @@ export default function PaymentHistory({ status }) {
                         : transaction._id
                     )
                   }
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                  className="mt-4 sm:mt-0 bg-blue-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-600 transition"
                 >
                   {selectedTransaction === transaction._id
                     ? "Hide Items"
                     : "View Items"}
                 </button>
               </div>
-
-              {/* Transaction items */}
               {selectedTransaction === transaction._id && (
                 <div className="mt-4 border-t border-gray-300 pt-4">
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">
                     Transaction Items
                   </h3>
-
-                  {/* If no items */}
                   {transactionItems.filter(
                     (item) => item.transaction_id === transaction._id
                   ).length === 0 ? (
@@ -147,7 +129,7 @@ export default function PaymentHistory({ status }) {
                       .map((item) => (
                         <div
                           key={item._id}
-                          className="flex justify-between bg-gray-100 p-4 rounded-lg shadow-sm mb-2"
+                          className="flex flex-col sm:flex-row justify-between bg-gray-100 p-4 rounded-lg shadow-sm mb-2"
                         >
                           <div>
                             <p className="text-gray-800 font-medium">

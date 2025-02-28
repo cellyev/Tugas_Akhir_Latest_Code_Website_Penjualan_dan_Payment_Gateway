@@ -5,7 +5,7 @@ const {
 } = require("../../utils/generateTokenAndSetCookie");
 const { doHashValidation } = require("../../utils/hashing");
 
-exports.SignIn = async (req, res) => {
+exports.signIn = async (req, res) => {
   const { username, password } = req.body;
 
   try {

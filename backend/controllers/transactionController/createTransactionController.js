@@ -23,11 +23,11 @@ exports.createTransaction = async (req, res) => {
       });
     }
 
-    // Cek transaksi yang masih pending dalam 15 menit terakhir
+    // Cek transaksi yang masih pending dalam 5 menit terakhir
     const existingTransaction = await Transactions.findOne({
       table_code,
       status: "pending",
-      createdAt: { $gte: new Date(Date.now() - 15 * 60 * 1000) },
+      createdAt: { $gte: new Date(Date.now() - 5 * 60 * 1000) },
     });
 
     if (existingTransaction) {

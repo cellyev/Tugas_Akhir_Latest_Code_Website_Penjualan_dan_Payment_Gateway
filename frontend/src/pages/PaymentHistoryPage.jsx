@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PaymentHistory from "../components/PaymentHistory";
-import { useAuthStore } from "../store/authStore"; // Import auth store
+import { useAuthStore } from "../store/authStore";
 
 export default function PaymentHistoryPage() {
   const navigate = useNavigate();
   const { status } = useParams();
   const [selectedStatus, setSelectedStatus] = useState(status || "completed");
-  const { signout } = useAuthStore(); // Ambil fungsi signout dari store
+  const { signout } = useAuthStore();
 
   const statusOptions = [
     { label: "Pending", value: "pending" },
@@ -18,7 +18,6 @@ export default function PaymentHistoryPage() {
     { label: "Cancelled", value: "cancelled" },
   ];
 
-  // Perbarui status ketika URL berubah
   useEffect(() => {
     if (status) {
       setSelectedStatus(status);
@@ -32,31 +31,33 @@ export default function PaymentHistoryPage() {
     }
   };
 
-  // Fungsi untuk logout
   const handleLogout = async () => {
     await signout();
     navigate("/admin/signin");
   };
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Payment History</h1>
+    <div className="container mx-auto px-4 sm:px-6 py-6">
+      {/* Header: Payment History & Logout Button */}
+      <div className="flex justify-between items-center w-full mb-6">
+        <h1 className="text-xl sm:text-3xl font-bold text-gray-800">
+          Payment History
+        </h1>
         <button
           onClick={handleLogout}
-          className="px-6 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition"
+          className="px-4 sm:px-6 py-2 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition"
         >
           Logout
         </button>
       </div>
 
-      {/* Pilihan status transaksi */}
-      <div className="flex flex-wrap justify-center gap-4 mb-8">
+      {/* Status filter */}
+      <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-8">
         {statusOptions.map(({ label, value }) => (
           <button
             key={value}
             onClick={() => handleStatusChange(value)}
-            className={`px-6 py-3 rounded-lg transition font-medium shadow-md ${
+            className={`px-4 sm:px-6 py-2 rounded-lg transition font-medium shadow-md text-sm sm:text-base ${
               selectedStatus === value
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white"
@@ -67,7 +68,6 @@ export default function PaymentHistoryPage() {
         ))}
       </div>
 
-      {/* Komponen PaymentHistory sesuai status yang dipilih */}
       <PaymentHistory status={selectedStatus} />
     </div>
   );
