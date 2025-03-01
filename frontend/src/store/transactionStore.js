@@ -90,7 +90,7 @@ export const useTransactionStore = create((set, get) => ({
         throw new Error("Transaction ID and status are required!");
       }
 
-      const response = await axios.post(
+      const response = await axios.put(
         `${API_URL}/${transaction_id}/payment/${status}`
       );
 

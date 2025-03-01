@@ -2,7 +2,6 @@ const axios = require("axios");
 const Transactions = require("../../models/transactionSchema");
 const TransactionItems = require("../../models/transactionItemSchema");
 const mongoose = require("mongoose");
-const Transaction = require("midtrans-client/lib/transaction");
 
 exports.getById = async (req, res) => {
   const { transaction_id } = req.params;
