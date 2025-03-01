@@ -21,7 +21,7 @@ const router = express.Router();
 router.post("/create", createTransaction);
 router.put("/:transaction_id/payment/:status", paying);
 
-router.get("/:transaction_id", getById);
+router.get("/id/:transaction_id", getById);
 
 // Use verify Token
 router.get("/status/:status", verifyToken, isAdmin, getAllTransactionByStatus);

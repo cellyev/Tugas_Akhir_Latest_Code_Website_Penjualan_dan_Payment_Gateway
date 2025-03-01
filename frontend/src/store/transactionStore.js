@@ -131,7 +131,7 @@ export const useTransactionStore = create((set, get) => ({
         throw new Error("Order ID and status are required!");
       }
 
-      const response = await axios.get(`${API_URL}/${transaction_id}`);
+      const response = await axios.get(`${API_URL}/id/${transaction_id}`);
 
       if (!response?.data) {
         throw new Error("Invalid response format");
