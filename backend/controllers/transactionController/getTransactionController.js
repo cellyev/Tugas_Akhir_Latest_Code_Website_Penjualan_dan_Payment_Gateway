@@ -201,10 +201,10 @@ exports.getAllTransactions = async (req, res) => {
 
 exports.getTransactionBySuccessAndIsRead = async (req, res) => {
   try {
-    const transaction = await Transactions.find({
+    const transaction = await Transactions.findOne({
       status: "completed",
       isRead: false,
-    });
+    }).sort({ createdAt: 1 });
 
     if (!transaction || transaction.length === 0) {
       return res.status(400).json({
