@@ -18,7 +18,7 @@ const { isAdmin } = require("../middlewares/isAdmin");
 
 const router = express.Router();
 
-router.post("/", createTransaction);
+router.post("/create", createTransaction);
 router.put("/:transaction_id/payment/:status", paying);
 
 router.get("/:transaction_id", getById);
