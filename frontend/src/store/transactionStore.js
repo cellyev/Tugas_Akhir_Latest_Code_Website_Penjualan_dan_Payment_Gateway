@@ -39,7 +39,7 @@ export const useTransactionStore = create((set, get) => ({
         );
       }
 
-      const response = await axios.post(`${API_URL}`, {
+      const response = await axios.post(`${API_URL}/`, {
         table_code,
         customer_name,
         customer_email,
