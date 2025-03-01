@@ -16,7 +16,7 @@ export const useAuthStore = create((set) => ({
   signin: async (username, password) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/signin`, {
+      const response = await axios.post(`${API_URL}/login`, {
         username,
         password,
       });
@@ -37,7 +37,7 @@ export const useAuthStore = create((set) => ({
   signout: async () => {
     set({ isLoading: true, error: null });
     try {
-      await axios.post(`${API_URL}/signout`);
+      await axios.post(`${API_URL}/logout`);
       set({
         user: null,
         isAuthenticated: false,
