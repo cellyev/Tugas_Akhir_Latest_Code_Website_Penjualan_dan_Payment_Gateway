@@ -18,18 +18,13 @@ const { isAdmin } = require("../middlewares/isAdmin");
 
 const router = express.Router();
 
-router.post("/create-transaction", createTransaction);
-router.post("/paying/:transaction_id/:status", paying);
+router.post("/", createTransaction);
+router.put("/:transaction_id/payment/:status", paying);
 
-router.get("/get-by-id/:transaction_id", getById);
+router.get("/:transaction_id", getById);
 
 // Use verify Token
-router.get(
-  "/get-by-status/:status",
-  verifyToken,
-  isAdmin,
-  getAllTransactionByStatus
-);
+router.get("/status/:status", verifyToken, isAdmin, getAllTransactionByStatus);
 
 router.get(
   "/get-transaction-succes-and-is-read",

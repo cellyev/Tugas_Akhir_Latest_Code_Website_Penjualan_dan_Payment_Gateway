@@ -2,13 +2,11 @@ import { create } from "zustand";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const API_URL = "https://vailovent.my.id/api/transaction";
+const API_URL = "https://vailovent.my.id/api/v1/transactions";
 const MIDTRANS_URL = "https://vailovent.my.id/api/midtrans/create-transaction";
-const GET_PAYMENT_API = "https://vailovent.my.id/api/transaction/get-by-id";
 
-// const API_URL = "http://localhost:8000/api/transaction";
+// const API_URL = "http://localhost:8000/api/v1/transactions";
 // const MIDTRANS_URL = "http://localhost:8000/api/midtrans/create-transaction";
-// const GET_PAYMENT_API = "http://localhost:8000/api/transaction/get-by-id";
 
 export const useTransactionStore = create((set, get) => ({
   table_code: "",
@@ -41,7 +39,7 @@ export const useTransactionStore = create((set, get) => ({
         );
       }
 
-      const response = await axios.post(`${API_URL}/create-transaction`, {
+      const response = await axios.post(`${API_URL}`, {
         table_code,
         customer_name,
         customer_email,
@@ -92,7 +90,7 @@ export const useTransactionStore = create((set, get) => ({
       }
 
       const response = await axios.post(
-        `${API_URL}/paying/${transaction_id}/${status}`
+        `${API_URL}/${transaction_id}/payment/${status}`
       );
 
       if (!response?.data) {
@@ -132,7 +130,7 @@ export const useTransactionStore = create((set, get) => ({
         throw new Error("Order ID and status are required!");
       }
 
-      const response = await axios.get(`${GET_PAYMENT_API}/${transaction_id}`);
+      const response = await axios.get(`${API_URL}/${transaction_id}`);
 
       if (!response?.data) {
         throw new Error("Invalid response format");
@@ -167,7 +165,7 @@ export const useTransactionStore = create((set, get) => ({
         throw new Error("Status is required!");
       }
 
-      const response = await axios.get(`${API_URL}/get-by-status/${status}`);
+      const response = await axios.get(`${API_URL}/status/${status}`);
       if (!response?.data) {
         throw new Error("Invalid response format");
       }

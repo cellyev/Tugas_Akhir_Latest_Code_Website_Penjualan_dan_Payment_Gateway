@@ -13,7 +13,7 @@ const {
 } = require("../controllers/productControllers/deleteProductController");
 const router = express.Router();
 
-router.get("/all-products", getAllProducts);
+router.get("/", getAllProducts);
 
 router.post(
   "/create-product-by-admin-who-not-admin-cannot-access-it",

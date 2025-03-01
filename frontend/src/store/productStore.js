@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL = "https://vailovent.my.id/api/product";
-// const API_URL = "http://localhost:8000/api/product";
+const API_URL = "https://vailovent.my.id/api/v1/products";
+// const API_URL = "http://localhost:8000/api/v1/products";
 
 export const useProductStore = create((set) => ({
   products: [],
@@ -12,7 +12,7 @@ export const useProductStore = create((set) => ({
   fetchProducts: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.get(`${API_URL}/all-products`);
+      const response = await axios.get(`${API_URL}`);
       set({
         products: response.data.data,
         isLoading: false,
