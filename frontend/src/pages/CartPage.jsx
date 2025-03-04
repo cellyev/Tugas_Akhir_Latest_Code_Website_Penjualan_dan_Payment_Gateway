@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { FaTrash, FaPlus, FaMinus } from "react-icons/fa";
 import { useTransactionStore } from "../store/transactionStore";
+import { useCartStore } from "../store/cartStore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
-  const [cart, setCart] = useState([]);
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [tableCode, setTableCode] = useState("");
   const [isPolling, setIsPolling] = useState(false);
   const navigate = useNavigate();
+  const { cart, setCart, removeItemFromCart } = useCartStore();
 
   const {
     setTransactionDetails,
@@ -22,16 +23,12 @@ export default function Cart() {
   } = useTransactionStore();
 
   useEffect(() => {
-    const storedCart = JSON.parse(sessionStorage.getItem("cart")) || [];
-    setCart(storedCart);
-
     const storedCustomer = JSON.parse(sessionStorage.getItem("customer"));
     if (storedCustomer) {
       setCustomerName(storedCustomer.name);
       setCustomerEmail(storedCustomer.email);
       setTableCode(storedCustomer.tableCode);
     } else {
-      // Kosongkan atau reset jika data tidak valid
       setCustomerName("");
       setCustomerEmail("");
       setTableCode("");
@@ -51,7 +48,6 @@ export default function Cart() {
     const updatedCart = [...cart];
     updatedCart[index].quantity += 1;
     setCart(updatedCart);
-    sessionStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
   const handleDecrement = (index) => {
@@ -62,13 +58,10 @@ export default function Cart() {
       updatedCart.splice(index, 1);
     }
     setCart(updatedCart);
-    sessionStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
   const handleRemoveItem = (index) => {
-    const updatedCart = cart.filter((_, i) => i !== index);
-    setCart(updatedCart);
-    sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+    removeItemFromCart(cart[index]._id);
   };
 
   const calculateTotal = () => {

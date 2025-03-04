@@ -1,41 +1,46 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-export const useCartStore = create((set) => ({
-  cart: JSON.parse(sessionStorage.getItem("cart")) || [],
+export const useCartStore = create(
+  persist(
+    (set) => ({
+      cart: [],
 
-  setCart: (newCart) => {
-    sessionStorage.setItem("cart", JSON.stringify(newCart));
-    set({ cart: newCart });
-  },
+      setCart: (newCart) => {
+        set({ cart: newCart });
+      },
 
-  clearCart: () => {
-    sessionStorage.removeItem("cart");
-    set({ cart: [] });
-  },
+      clearCart: () => {
+        set({ cart: [] });
+      },
 
-  addItemToCart: (item) =>
-    set((state) => {
-      const existingItem = state.cart.find((i) => i._id === item._id);
+      addItemToCart: (item) =>
+        set((state) => {
+          const existingItem = state.cart.find((i) => i._id === item._id);
 
-      let updatedCart;
-      if (existingItem) {
-        updatedCart = state.cart.map((i) =>
-          i._id === item._id
-            ? { ...i, quantity: i.quantity + item.quantity }
-            : i
-        );
-      } else {
-        updatedCart = [...state.cart, item];
-      }
+          let updatedCart;
+          if (existingItem) {
+            updatedCart = state.cart.map((i) =>
+              i._id === item._id
+                ? { ...i, quantity: i.quantity + item.quantity }
+                : i
+            );
+          } else {
+            updatedCart = [...state.cart, item];
+          }
 
-      sessionStorage.setItem("cart", JSON.stringify(updatedCart));
-      return { cart: updatedCart };
+          return { cart: updatedCart };
+        }),
+
+      removeItemFromCart: (itemId) =>
+        set((state) => {
+          const updatedCart = state.cart.filter((i) => i._id !== itemId);
+          return { cart: updatedCart };
+        }),
     }),
-
-  removeItemFromCart: (itemId) =>
-    set((state) => {
-      const updatedCart = state.cart.filter((i) => i._id !== itemId);
-      sessionStorage.setItem("cart", JSON.stringify(updatedCart));
-      return { cart: updatedCart };
-    }),
-}));
+    {
+      name: "cart-storage",
+      getStorage: () => sessionStorage,
+    }
+  )
+);

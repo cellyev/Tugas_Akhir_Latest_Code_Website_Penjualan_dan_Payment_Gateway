@@ -38,14 +38,11 @@ exports.getById = async (req, res) => {
     }
 
     const vailovent_id = `VAILOVENT-${transaction_id}`;
-    // console.log("Generated Vailovent ID:", vailovent_id);
 
     const midtransUrl =
       "https://payment.evognito.my.id/midtrans/get-data?param=VAILOVENT";
 
     const response = await axios.get(midtransUrl);
-
-    // console.log("Midtrans Response:", JSON.stringify(response.data, null, 2));
 
     if (!response.data || !response.data.data) {
       return res.status(500).json({
@@ -69,17 +66,10 @@ exports.getById = async (req, res) => {
       });
     }
 
-    // Debugging: Cetak semua order_id dari API
-    // midtransData.forEach((item) =>
-    //   console.log("Order ID dari API:", item.order_id)
-    // );
-
     // Filter data dengan order_id yang sesuai
     const filteredData = midtransData.filter(
       (item) => item.order_id === vailovent_id
     );
-
-    // console.log("Filtered Data:", filteredData);
 
     // Ambil satu transaksi saja (jika ada lebih dari satu)
     const selectedTransaction =
@@ -93,7 +83,7 @@ exports.getById = async (req, res) => {
       data: {
         transaction: existingTransaction,
         transactionItems: existingTransactionItems,
-        midtransData: selectedTransaction, // Ambil satu transaksi saja
+        midtransData: selectedTransaction,
       },
     });
   } catch (error) {

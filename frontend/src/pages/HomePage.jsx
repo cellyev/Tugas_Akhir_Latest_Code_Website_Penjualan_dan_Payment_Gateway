@@ -14,6 +14,7 @@ export default function HomePage() {
     fetchProducts(); // Panggil fungsi untuk mengambil produk
   }, [fetchProducts]);
 
+  // Format harga ke dalam IDR
   const formatCurrency = (amount) => {
     return amount.toLocaleString("id-ID", {
       style: "currency",
@@ -21,6 +22,10 @@ export default function HomePage() {
     });
   };
 
+  // Hitung total quantity dalam cart
+  const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
+
+  // Hitung total harga dalam cart
   const totalAmount = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
@@ -28,10 +33,11 @@ export default function HomePage() {
 
   if (isLoading)
     return (
-      <div className="text-center text-xl text-gray-600">
-        Loading products...
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-yellow-500 border-solid"></div>
       </div>
     );
+
   if (error)
     return (
       <div className="text-center text-xl text-red-500">Error: {error}</div>
@@ -55,14 +61,14 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Floating Cart Button */}
+      {/* Floating Cart Button (seperti semula) */}
       <button
         className="fixed bottom-6 right-6 bg-yellow-500 text-gray-900 p-4 rounded-full shadow-lg flex items-center space-x-3 hover:bg-yellow-600 transition duration-300"
         onClick={() => navigate("/cart")}
       >
         <FaShoppingCart className="text-2xl" />
         <div className="text-lg font-bold">
-          {cart.length} Items
+          {totalQuantity} Items
           <p className="text-sm font-medium">{formatCurrency(totalAmount)}</p>
         </div>
       </button>

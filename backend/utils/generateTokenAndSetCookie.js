@@ -28,7 +28,7 @@ exports.generateTokenAndSetCookie = (res, userId, username) => {
   // });
 
   res.cookie("Authorization", token, {
-    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
     httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",

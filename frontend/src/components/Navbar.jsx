@@ -19,7 +19,7 @@ export default function Navbar() {
   };
 
   // Get the cart count
-  const cartCount = cart.length;
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <div className="bg-gradient-to-r from-gray-900 to-gray-700 shadow-lg sticky top-0 z-10 transition-shadow duration-300">
