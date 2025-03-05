@@ -3,6 +3,7 @@ const Products = require("../../models/productSchema");
 const {
   sendPaymentEmail,
 } = require("../../middlewares/sendMail/sendPaymentEmail");
+const EmailLogs = require("../../models/emailLogSchema");
 
 exports.createTransactionMidtrans = async (req, res) => {
   const { customer_name, customer_email, products, transaction_id } = req.body;
@@ -84,6 +85,15 @@ exports.createTransactionMidtrans = async (req, res) => {
 
   try {
     const transaction = await snap.createTransaction(parameter);
+
+    const validateEmail = await EmailLogs.findOne({
+      transaction_id,
+      payload: "Create Transaction",
+    });
+    if (validateEmail) {
+      return;
+    }
+
     const send_email = await sendPaymentEmail(
       customer_email,
       customer_name,
@@ -92,6 +102,14 @@ exports.createTransactionMidtrans = async (req, res) => {
       itemDetails,
       transaction.redirect_url
     );
+
+    const newEmaillog = new EmailLogs({
+      transaction_id,
+      customer_email,
+      payload: "Create Transaction",
+    });
+    await newEmaillog.save();
+
     return res.status(200).json({
       redirect_url: transaction.redirect_url,
     });

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Transactions = require("../../models/transactionSchema");
 const TransactionItems = require("../../models/transactionItemSchema");
+const EmailLogs = require("../../models/emailLogSchema");
 
 const {
   sendFailedEmail,
@@ -30,6 +31,15 @@ exports.paying = async (req, res) => {
       });
     }
 
+    const statusNumber = parseInt(status, 10);
+    if (!statusMapping[statusNumber]) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status! Status must be between 1 and 6.",
+        data: null,
+      });
+    }
+
     if (!mongoose.Types.ObjectId.isValid(transaction_id)) {
       return res.status(400).json({
         success: false,
@@ -47,17 +57,12 @@ exports.paying = async (req, res) => {
       });
     }
 
-    const statusNumber = parseInt(status, 10);
-    if (!statusMapping[statusNumber]) {
+    if (existingTransaction.status === "completed") {
       return res.status(400).json({
         success: false,
-        message: "Invalid status! Status must be between 1 and 6.",
+        message: "Transaction already completed!",
         data: null,
       });
-    }
-
-    if (existingTransaction.status === "completed") {
-      return;
     }
 
     existingTransaction.status = statusMapping[statusNumber];
@@ -65,18 +70,41 @@ exports.paying = async (req, res) => {
 
     const items = await TransactionItems.find({ transaction_id });
 
+    // Kirim email hanya jika transaksi sukses atau gagal
+    let emailPayload = null;
     if (statusNumber === 3) {
-      await sendSuccessEmail(
-        existingTransaction.customer_email,
-        existingTransaction,
-        items
-      );
-    } else {
-      await sendFailedEmail(
-        existingTransaction.customer_email,
-        existingTransaction,
-        items
-      );
+      emailPayload = "Success Transaction";
+    } else if ([4, 5, 6].includes(statusNumber)) {
+      emailPayload = "Fail Transaction";
+    }
+
+    if (emailPayload) {
+      const emailExists = await EmailLogs.findOne({
+        transaction_id,
+        payload: emailPayload,
+      });
+
+      if (!emailExists) {
+        // Kirim email & simpan log secara paralel
+        Promise.all([
+          emailPayload === "Success Transaction"
+            ? sendSuccessEmail(
+                existingTransaction.customer_email,
+                existingTransaction,
+                items
+              )
+            : sendFailedEmail(
+                existingTransaction.customer_email,
+                existingTransaction,
+                items
+              ),
+          new EmailLogs({
+            transaction_id,
+            customer_email: existingTransaction.customer_email,
+            payload: emailPayload,
+          }).save(),
+        ]).catch((err) => console.error("Email sending/logging failed:", err));
+      }
     }
 
     return res.status(200).json({
