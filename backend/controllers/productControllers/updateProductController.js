@@ -1,7 +1,6 @@
 const {
   updateProductValidator,
-} = require("../../middlewares/productValidator");
-const Products = require("../../models/productSchema");
+} = require("../../middlewares/productValidators/updateProductValidator");
 const {
   findProductByName,
   findProductByImage,

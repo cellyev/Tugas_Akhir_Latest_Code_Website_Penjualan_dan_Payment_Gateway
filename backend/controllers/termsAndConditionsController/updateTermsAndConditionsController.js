@@ -1,6 +1,6 @@
 const {
-  termsAndConditionsValidator,
-} = require("../../middlewares/termsAndConditionsValidator");
+  updateTermsAndConditionsValidator,
+} = require("../../middlewares/termsAndConditionsValidators/updateTermsAndConditionsValidator");
 const TermsAndConditions = require("../../models/termsAndConditionsSchema");
 const mongoose = require("mongoose");
 
@@ -28,7 +28,11 @@ exports.updateTermsAndConditions = async (req, res) => {
     }
 
     // Validasi input
-    const { error } = termsAndConditionsValidator.validate({ title, text, no });
+    const { error } = updateTermsAndConditionsValidator.validate({
+      title,
+      text,
+      no,
+    });
     if (error) {
       return res.status(400).json({
         success: false,

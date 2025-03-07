@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useTransactionStore } from "../store/transactionStore";
+import { useAdminStore } from "../store/adminStore";
 import { toast } from "react-toastify";
 
 export default function PaymentHistory({ status }) {
@@ -11,7 +12,12 @@ export default function PaymentHistory({ status }) {
     error,
     clearTransactions,
   } = useTransactionStore();
+
+  const { updateTransactionCookingStatus, isLoading: isUpdating } =
+    useAdminStore(); // Store untuk update status cooking
+
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [cookingStatus, setCookingStatus] = useState({}); // State untuk status memasak tiap transaksi
 
   const fetchTransactions = useCallback(async () => {
     if (!status) return;
@@ -27,6 +33,7 @@ export default function PaymentHistory({ status }) {
     fetchTransactions();
   }, [status, fetchTransactions, clearTransactions]);
 
+  // Format mata uang
   const formatCurrency = (amount) => {
     if (typeof amount !== "number" || isNaN(amount)) {
       return "Rp 0";
@@ -37,6 +44,7 @@ export default function PaymentHistory({ status }) {
     });
   };
 
+  // Format tanggal
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -47,6 +55,19 @@ export default function PaymentHistory({ status }) {
       minute: "numeric",
       second: "numeric",
     });
+  };
+
+  // Handle perubahan status memasak
+  const handleCookingStatusChange = async (transactionId, newStatus) => {
+    try {
+      setCookingStatus((prev) => ({ ...prev, [transactionId]: newStatus }));
+
+      await updateTransactionCookingStatus(transactionId, newStatus);
+
+      toast.success("Cooking status updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update cooking status!");
+    }
   };
 
   return (
@@ -96,7 +117,35 @@ export default function PaymentHistory({ status }) {
                   <p className="text-gray-500">
                     Created At: {formatDate(transaction.createdAt)}
                   </p>
+
+                  {/* COOKING STATUS DROPDOWN */}
+                  <div className="mt-3">
+                    <label className="text-gray-700 font-medium">
+                      Cooking Status:
+                    </label>
+                    <select
+                      value={
+                        cookingStatus[transaction._id] ||
+                        transaction.cooking_status
+                      }
+                      onChange={(e) =>
+                        handleCookingStatusChange(
+                          transaction._id,
+                          e.target.value
+                        )
+                      }
+                      className="block w-full mt-1 px-3 py-2 border rounded-lg focus:ring focus:ring-blue-300 disabled:bg-gray-200 disabled:cursor-not-allowed"
+                      disabled={
+                        transaction.status !== "completed" || isUpdating
+                      }
+                    >
+                      <option value="Being Cooked">Being Cooked</option>
+                      <option value="Ready to Serve">Ready to Serve</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
                 </div>
+
                 <button
                   onClick={() =>
                     setSelectedTransaction(
@@ -112,6 +161,8 @@ export default function PaymentHistory({ status }) {
                     : "View Items"}
                 </button>
               </div>
+
+              {/* LIST ITEM TRANSAKSI */}
               {selectedTransaction === transaction._id && (
                 <div className="mt-4 border-t border-gray-300 pt-4">
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">

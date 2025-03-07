@@ -11,8 +11,10 @@ const {
 const {
   deleteProduct,
 } = require("../controllers/productControllers/deleteProductController");
+
 const router = express.Router();
 
+// Router
 router.get("/", getAllProducts);
 
 router.post(
@@ -29,4 +31,5 @@ router.delete(
   deleteProduct
 );
 
+// export Router
 module.exports = router;

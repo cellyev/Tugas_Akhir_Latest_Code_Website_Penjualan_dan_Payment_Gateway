@@ -1,6 +1,6 @@
 const {
   createProductValidator,
-} = require("../../middlewares/productValidator");
+} = require("../../middlewares/productValidators/createProductValidator");
 const Products = require("../../models/productSchema");
 const {
   findProductByName,

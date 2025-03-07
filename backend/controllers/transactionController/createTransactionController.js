@@ -3,7 +3,7 @@ const TransactionItems = require("../../models/transactionItemSchema");
 const { findProductById } = require("../../utils/FindProduct");
 const {
   createTransactionValidator,
-} = require("../../middlewares/transactionValidator");
+} = require("../../middlewares/transactionValidators/createTransactionValidator");
 
 exports.createTransaction = async (req, res) => {
   const { table_code, customer_name, customer_email, products } = req.body;

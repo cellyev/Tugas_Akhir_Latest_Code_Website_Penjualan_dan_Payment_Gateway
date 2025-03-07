@@ -1,4 +1,6 @@
-const { signUpValidator } = require("../../middlewares/authValidator");
+const {
+  signUpValidator,
+} = require("../../middlewares/authValidators/signUpValidator");
 const User = require("../../models/userSchema");
 const { doHash } = require("../../utils/hashing");
 

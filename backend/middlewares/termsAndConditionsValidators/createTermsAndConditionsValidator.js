@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-exports.termsAndConditionsValidator = Joi.object({
+exports.createTermsAndConditionsValidator = Joi.object({
   title: Joi.string().trim().min(5).max(100).required().messages({
     "string.empty": "Title is required",
     "string.min": "Title must be at least 5 characters long",

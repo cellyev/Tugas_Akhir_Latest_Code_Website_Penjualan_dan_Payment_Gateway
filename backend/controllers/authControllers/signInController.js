@@ -1,4 +1,6 @@
-const { signInValidator } = require("../../middlewares/authValidator");
+const {
+  signInValidator,
+} = require("../../middlewares/authValidators/signInValidator");
 const User = require("../../models/userSchema");
 const {
   generateTokenAndSetCookie,

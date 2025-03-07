@@ -8,6 +8,7 @@ const transactionRoute = require("./routes/transactionRoute");
 const termsAndConditionsRoute = require("./routes/termsAndConditionsRoute");
 const midtransRoute = require("./routes/midtransRoute");
 const authRoute = require("./routes/authRoute");
+const adminRoute = require("./routes/adminRoute");
 const path = require("path");
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.use("/api/v1/transactions", transactionRoute);
 app.use("/api/v1/termsAndConditions", termsAndConditionsRoute);
 app.use("/api/v1/midtrans", midtransRoute);
 app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/admin", adminRoute);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));

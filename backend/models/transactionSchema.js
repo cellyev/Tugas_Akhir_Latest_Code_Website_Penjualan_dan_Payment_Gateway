@@ -43,6 +43,12 @@ const transactionSchema = new mongoose.Schema(
         message: "Amount must be a valid number!",
       },
     },
+    cooking_status: {
+      type: String,
+      required: true,
+      enum: ["Being Cooked", "Ready to Serve", "Completed"],
+      default: "Being Cooked",
+    },
     status: {
       type: String,
       required: true,

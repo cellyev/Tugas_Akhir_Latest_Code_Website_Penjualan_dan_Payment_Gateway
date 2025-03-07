@@ -1,13 +1,13 @@
 const {
-  termsAndConditionsValidator,
-} = require("../../middlewares/termsAndConditionsValidator");
+  createTermsAndConditionsValidator,
+} = require("../../middlewares/termsAndConditionsValidators/createTermsAndConditionsValidator");
 const TermsAndConditions = require("../../models/termsAndConditionsSchema");
 
 exports.createTermsAndConditions = async (req, res) => {
   const { title, text, no } = req.body;
 
   try {
-    const { error } = termsAndConditionsValidator.validate({
+    const { error } = createTermsAndConditionsValidator.validate({
       title,
       text,
       no,
