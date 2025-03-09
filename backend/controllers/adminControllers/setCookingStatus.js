@@ -29,7 +29,12 @@ exports.setCookingStatus = async (req, res) => {
     }
 
     // Validate cooking_status value
-    const validCookingStatus = ["Being Cooked", "Ready to Serve", "Completed"];
+    const validCookingStatus = [
+      "Not Started",
+      "Being Cooked",
+      "Ready to Serve",
+      "Completed",
+    ];
     if (!validCookingStatus.includes(cooking_status)) {
       return res.status(400).json({
         success: false,

@@ -46,8 +46,8 @@ const transactionSchema = new mongoose.Schema(
     cooking_status: {
       type: String,
       required: true,
-      enum: ["Being Cooked", "Ready to Serve", "Completed"],
-      default: "Being Cooked",
+      enum: ["Not Started", "Being Cooked", "Ready to Serve", "Completed"],
+      default: "Not Started",
     },
     status: {
       type: String,

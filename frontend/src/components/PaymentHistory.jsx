@@ -139,6 +139,7 @@ export default function PaymentHistory({ status }) {
                         transaction.status !== "completed" || isUpdating
                       }
                     >
+                      <option value="Not Started">Not Started</option>
                       <option value="Being Cooked">Being Cooked</option>
                       <option value="Ready to Serve">Ready to Serve</option>
                       <option value="Completed">Completed</option>
