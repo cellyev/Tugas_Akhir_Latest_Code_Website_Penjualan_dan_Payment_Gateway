@@ -7,18 +7,15 @@ const PaymentStatus = () => {
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const raw_transaction_id = queryParams.get("order_id");
-  const transaction_id = raw_transaction_id
+  const transaction_id = raw_transaction_id?.includes("-")
     ? raw_transaction_id.split("-").pop()
     : null;
-
   const status = queryParams.get("transaction_status") || "unknown";
 
   const [paymentDetails, setPaymentDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const { fetchTransaction } = useTransactionStore();
 
-  // Gunakan useCallback untuk memastikan fungsi tidak berubah di setiap render
   const fetchData = useCallback(async () => {
     if (!transaction_id) {
       setTimeout(() => navigate("/"), 3000);
@@ -27,7 +24,7 @@ const PaymentStatus = () => {
 
     try {
       const data = await fetchTransaction(transaction_id);
-      if (data) {
+      if (data && data.transaction) {
         setPaymentDetails(data);
       }
     } catch (error) {
@@ -39,7 +36,7 @@ const PaymentStatus = () => {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]); // Tambahkan fetchData sebagai dependensi
+  }, [fetchData]);
 
   if (loading) {
     return (
@@ -49,7 +46,7 @@ const PaymentStatus = () => {
     );
   }
 
-  if (!paymentDetails) {
+  if (!paymentDetails || !paymentDetails.transaction) {
     return (
       <div className="p-4 max-w-md mx-auto text-center">
         <p className="text-red-500">Failed to fetch transaction details.</p>
@@ -64,8 +61,8 @@ const PaymentStatus = () => {
     );
   }
 
-  const { amount, items } = paymentDetails;
-  const itemsArray = Array.isArray(items) ? items : items ? [items] : [];
+  const { transaction, transactionItems } = paymentDetails;
+  const itemsArray = Array.isArray(transactionItems) ? transactionItems : [];
 
   return (
     <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
@@ -88,10 +85,7 @@ const PaymentStatus = () => {
           Transaction ID: <span className="font-medium">{transaction_id}</span>
         </p>
         <p className="text-sm text-gray-600">
-          Amount:{" "}
-          <span className="font-medium">
-            Rp {amount ? parseFloat(amount).toLocaleString() : "0"}
-          </span>
+          Amount: Rp {parseFloat(transaction.amount || 0).toLocaleString()}
         </p>
       </div>
 
@@ -141,7 +135,7 @@ const PaymentStatus = () => {
             status === "settlement" ? "text-blue-600" : "text-red-600"
           }`}
         >
-          Rp {amount ? parseFloat(amount).toLocaleString() : "N/A"}
+          Rp {parseFloat(transaction.amount || 0).toLocaleString()}
         </p>
       </div>
 
