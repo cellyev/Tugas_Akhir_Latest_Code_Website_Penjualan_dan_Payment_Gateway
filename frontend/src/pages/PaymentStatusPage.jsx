@@ -1,45 +1,67 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { fetchTransaction } from "../store/useTransactionStore";
+import { useEffect, useState, useCallback } from "react";
+import { useTransactionStore } from "../store/transactionStore";
 
 const PaymentStatus = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const transaction_id = queryParams.get("order_id");
-  const status = queryParams.get("transaction_status");
+  const status = queryParams.get("transaction_status") || "unknown";
 
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const { fetchTransaction } = useTransactionStore();
+
+  // Gunakan useCallback untuk memastikan fungsi tidak berubah di setiap render
+  const fetchData = useCallback(async () => {
     if (!transaction_id) {
       setTimeout(() => navigate("/"), 3000);
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        const data = await fetchTransaction(transaction_id);
+    try {
+      const data = await fetchTransaction(transaction_id);
+      if (data) {
         setPaymentDetails(data);
-      } catch (error) {
-        console.error("Error fetching transaction:", error);
-        setTimeout(() => navigate("/"), 3000);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching transaction:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [transaction_id, navigate, fetchTransaction]);
 
+  useEffect(() => {
     fetchData();
-  }, [transaction_id, navigate]);
+  }, [fetchData]); // Tambahkan fetchData sebagai dependensi
+
+  if (loading) {
+    return (
+      <div className="p-4 max-w-md mx-auto text-center">
+        <p>Loading payment details... Please wait.</p>
+      </div>
+    );
+  }
 
   if (!paymentDetails) {
     return (
       <div className="p-4 max-w-md mx-auto text-center">
-        <p>Loading payment details... Redirecting if failed.</p>
+        <p className="text-red-500">Failed to fetch transaction details.</p>
+        <p>Redirecting to home...</p>
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
+        >
+          Go to Home
+        </button>
       </div>
     );
   }
 
   const { amount, items } = paymentDetails;
-  let itemsArray = Array.isArray(items) ? items : items ? [items] : [];
+  const itemsArray = Array.isArray(items) ? items : items ? [items] : [];
 
   return (
     <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
@@ -52,11 +74,11 @@ const PaymentStatus = () => {
       </h1>
       <div className="mb-4">
         <p
-          className={`${
+          className={`font-semibold text-lg mb-2 ${
             status === "settlement" ? "text-green-600" : "text-red-600"
-          } font-semibold text-lg mb-2`}
+          }`}
         >
-          Status: {status}
+          Status: {status.charAt(0).toUpperCase() + status.slice(1)}
         </p>
         <p className="text-sm text-gray-600">
           Transaction ID: <span className="font-medium">{transaction_id}</span>
