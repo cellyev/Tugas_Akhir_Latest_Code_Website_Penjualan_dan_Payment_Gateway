@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { FaTrash, FaPlus, FaMinus } from "react-icons/fa";
 import { useTransactionStore } from "../store/transactionStore";
 import { useCartStore } from "../store/cartStore";
@@ -9,17 +9,11 @@ export default function Cart() {
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [tableCode, setTableCode] = useState("");
-  const [isPolling, setIsPolling] = useState(false);
   const navigate = useNavigate();
   const { cart, setCart, removeItemFromCart } = useCartStore();
 
-  const {
-    setTransactionDetails,
-    createTransaction,
-    fetchTransaction,
-    error,
-    isLoading,
-  } = useTransactionStore();
+  const { setTransactionDetails, createTransaction, error, isLoading } =
+    useTransactionStore();
 
   useEffect(() => {
     const storedCustomer = JSON.parse(sessionStorage.getItem("customer"));
@@ -94,51 +88,10 @@ export default function Cart() {
       setCart([]);
       sessionStorage.removeItem("cart");
       window.open(response.redirect_url, "_blank");
-
-      if (!isPolling) {
-        setIsPolling(true);
-        startPolling(response.savedTransaction._id);
-      }
     } catch (error) {
       console.log(error);
       toast.error("Failed to create transaction!");
     }
-  };
-
-  const pollingInterval = useRef(null);
-  const startPolling = (transaction_id) => {
-    if (pollingInterval.current) return; // Mencegah polling ganda
-
-    pollingInterval.current = setInterval(async () => {
-      try {
-        const transactionData = await fetchTransaction(transaction_id);
-        if (!transactionData?.data?.transaction) return;
-
-        const status = transactionData.data.transaction.status;
-        if (status !== "pending") {
-          // Jika tidak lagi pending, hentikan polling
-          clearInterval(pollingInterval.current);
-          pollingInterval.current = null;
-          setTimeout(() => window.location.reload(), 1000);
-
-          const route =
-            status === "completed" ? "/payment-success" : "/payment-failed";
-          const statusMessage =
-            status === "completed" ? "Payment successful!" : "Payment Failed!";
-          toast.success(statusMessage);
-          navigate(route, {
-            state: {
-              status: status || "Unknown",
-              transaction_id,
-              amount: transactionData.data.transaction.total_amount,
-              items: transactionData.data.transactionItems,
-            },
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching transaction:", error);
-      }
-    }, 3000);
   };
 
   return (

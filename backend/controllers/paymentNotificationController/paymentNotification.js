@@ -44,7 +44,7 @@ exports.payment_notification = async (req, res) => {
     }
 
     // Periksa status transaksi dari Midtrans dan ubah status di database
-    let email_payload = null;
+    const email_payload = null;
 
     switch (transaction_status) {
       case "settlement":
