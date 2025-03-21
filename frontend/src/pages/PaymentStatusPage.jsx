@@ -85,7 +85,8 @@ const PaymentStatus = () => {
           Transaction ID: <span className="font-medium">{transaction_id}</span>
         </p>
         <p className="text-sm text-gray-600">
-          Amount: Rp {parseFloat(transaction.amount || 0).toLocaleString()}
+          Amount: Rp{" "}
+          {parseFloat(transaction.total_amount || 0).toLocaleString()}
         </p>
       </div>
 
@@ -135,7 +136,7 @@ const PaymentStatus = () => {
             status === "settlement" ? "text-blue-600" : "text-red-600"
           }`}
         >
-          Rp {parseFloat(transaction.amount || 0).toLocaleString()}
+          Rp {parseFloat(transaction.total_amount || 0).toLocaleString()}
         </p>
       </div>
 

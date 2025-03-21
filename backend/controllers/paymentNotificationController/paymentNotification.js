@@ -24,6 +24,7 @@ exports.payment_notification = async (req, res) => {
         data: null,
       });
     }
+
     const transaction_id = order_id.split("-")[1];
 
     // Cari transaksi dan item transaksi secara paralel
@@ -50,50 +51,25 @@ exports.payment_notification = async (req, res) => {
       });
     }
 
-    // Periksa status transaksi dari Midtrans dan ubah status di database
-    let email_payload = null;
+    // Tentukan email_payload berdasarkan transaction_status
+    let email_payload = "Unknown Transaction Status"; // Nilai default
 
-    switch (transaction_status) {
-      case "settlement":
-        console.log(`Pembayaran sukses untuk Order ID: ${transaction_id}`);
-        transaction.status = "completed";
-        email_payload = "Success Transaction";
-        break;
-      case "expire":
-        console.log(`Pembayaran expired untuk Order ID: ${transaction_id}`);
-        transaction.status = "expired";
-        email_payload = "Fail Transaction";
-        break;
-      case "pending":
-        console.log(`Pembayaran pending untuk Order ID: ${transaction_id}`);
-        transaction.status = "pending";
-        break;
-      case "cancel":
-        console.log(`Pembayaran dibatalkan untuk Order ID: ${transaction_id}`);
-        transaction.status = "canceled";
-        email_payload = "Fail Transaction";
-        break;
-      case "deny":
-      case "challenge":
-        console.log(`Pembayaran ditolak untuk Order ID: ${transaction_id}`);
-        transaction.status = "failed";
-        email_payload = "Fail Transaction";
-        break;
-      default:
-        console.log(`Status transaksi tidak dikenali: ${transaction_status}`);
-        return res.status(400).json({
-          success: false,
-          message: `Unrecognized transaction status: ${transaction_status}`,
-          data: null,
-        });
+    if (transaction_status === "settlement") {
+      email_payload = "Success Transaction";
+    } else if (transaction_status === "pending") {
+      email_payload = "Pending Transaction";
+    } else if (
+      transaction_status === "cancel" ||
+      transaction_status === "expire"
+    ) {
+      email_payload = "Fail Transaction";
     }
 
     // Simpan perubahan status transaksi
+    transaction.status = transaction_status;
     await transaction.save();
 
-    console.log("Email Payload:", email_payload);
-
-    // Kirim email hanya jika transaksi sukses atau gagal
+    // Kirim email hanya jika transaksi sukses, gagal, atau pending
     if (email_payload && transaction.customer_email) {
       const email_exists = await EmailLogs.findOne({
         transaction_id,
