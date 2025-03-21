@@ -14,9 +14,16 @@ exports.payment_notification = async (req, res) => {
     const notification = req.body;
     console.log("Payment Notification:", notification);
 
-    const { transaction_status, order_id, fraud_status } = notification;
+    const { transaction_status, order_id } = notification;
 
-    // Ekstrak ID transaksi dari order_id Midtrans (format: "order-<id>")
+    // Validasi order_id sebelum melakukan split
+    if (!order_id || !order_id.includes("-")) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order_id format.",
+        data: null,
+      });
+    }
     const transaction_id = order_id.split("-")[1];
 
     // Cari transaksi dan item transaksi secara paralel
@@ -84,14 +91,18 @@ exports.payment_notification = async (req, res) => {
     // Simpan perubahan status transaksi
     await transaction.save();
 
+    console.log("Email Payload:", email_payload);
+
     // Kirim email hanya jika transaksi sukses atau gagal
-    if (email_payload) {
+    if (email_payload && transaction.customer_email) {
       const email_exists = await EmailLogs.findOne({
         transaction_id,
         payload: email_payload,
       });
 
       if (!email_exists) {
+        console.log("Mengirim email notifikasi...");
+
         // Kirim email & simpan log secara paralel
         await Promise.allSettled([
           email_payload === "Success Transaction"
@@ -111,7 +122,17 @@ exports.payment_notification = async (req, res) => {
             payload: email_payload,
           }).save(),
         ]);
+
+        console.log("Email berhasil dikirim & log disimpan.");
+      } else {
+        console.log(
+          "Email sudah pernah dikirim sebelumnya, tidak dikirim ulang."
+        );
       }
+    } else {
+      console.log(
+        "Tidak ada email yang dikirim karena email_payload kosong atau email pelanggan tidak tersedia."
+      );
     }
 
     return res.status(200).json({
