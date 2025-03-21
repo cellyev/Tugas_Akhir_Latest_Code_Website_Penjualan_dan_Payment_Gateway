@@ -6,7 +6,11 @@ const PaymentStatus = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
-  const transaction_id = queryParams.get("order_id");
+  const raw_transaction_id = queryParams.get("order_id");
+  const transaction_id = raw_transaction_id
+    ? raw_transaction_id.split("-").pop()
+    : null;
+
   const status = queryParams.get("transaction_status") || "unknown";
 
   const [paymentDetails, setPaymentDetails] = useState(null);

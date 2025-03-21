@@ -44,7 +44,7 @@ exports.payment_notification = async (req, res) => {
     }
 
     // Periksa status transaksi dari Midtrans dan ubah status di database
-    const email_payload = null;
+    let email_payload = null;
 
     switch (transaction_status) {
       case "settlement":
@@ -72,6 +72,13 @@ exports.payment_notification = async (req, res) => {
         transaction.status = "failed";
         email_payload = "Fail Transaction";
         break;
+      default:
+        console.log(`Status transaksi tidak dikenali: ${transaction_status}`);
+        return res.status(400).json({
+          success: false,
+          message: `Unrecognized transaction status: ${transaction_status}`,
+          data: null,
+        });
     }
 
     // Simpan perubahan status transaksi
