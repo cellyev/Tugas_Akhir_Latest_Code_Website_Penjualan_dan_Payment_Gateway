@@ -55,18 +55,20 @@ exports.payment_notification = async (req, res) => {
     let email_payload = "Unknown Transaction Status"; // Nilai default
 
     if (transaction_status === "settlement") {
+      transaction.status === "completed";
       email_payload = "Success Transaction";
     } else if (transaction_status === "pending") {
+      transaction.status = transaction_status;
       email_payload = "Pending Transaction";
     } else if (
       transaction_status === "cancel" ||
       transaction_status === "expire"
     ) {
+      transaction.status = transaction_status;
       email_payload = "Fail Transaction";
     }
 
     // Simpan perubahan status transaksi
-    transaction.status = transaction_status;
     await transaction.save();
 
     // Kirim email hanya jika transaksi sukses, gagal, atau pending
