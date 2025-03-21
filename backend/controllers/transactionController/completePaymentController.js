@@ -57,14 +57,6 @@ exports.paying = async (req, res) => {
       });
     }
 
-    // if (existingTransaction.status === "completed") {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Transaction already completed!",
-    //     data: null,
-    //   });
-    // }
-
     existingTransaction.status = statusMapping[statusNumber];
     const result = await existingTransaction.save();
 

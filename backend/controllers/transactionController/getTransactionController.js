@@ -29,61 +29,12 @@ exports.getById = async (req, res) => {
       transaction_id,
     });
 
-    if (!existingTransactionItems) {
-      return res.status(404).json({
-        success: false,
-        message: "Transaction items not found",
-        data: null,
-      });
-    }
-
-    const vailovent_id = `VAILOVENT-${transaction_id}`;
-
-    const midtransUrl =
-      "https://payment.evognito.my.id/midtrans/get-data?param=VAILOVENT";
-
-    const response = await axios.get(midtransUrl);
-
-    if (!response.data || !response.data.data) {
-      return res.status(500).json({
-        success: false,
-        message: "Failed to fetch transaction data from Midtrans",
-        data: null,
-      });
-    }
-
-    let midtransData = response.data.data;
-
-    if (!Array.isArray(midtransData) && midtransData.transactions) {
-      midtransData = midtransData.transactions;
-    }
-
-    if (!Array.isArray(midtransData)) {
-      return res.status(500).json({
-        success: false,
-        message: "Invalid data format received from Midtrans",
-        data: null,
-      });
-    }
-
-    // Filter data dengan order_id yang sesuai
-    const filteredData = midtransData.filter(
-      (item) => item.order_id === vailovent_id
-    );
-
-    // Ambil satu transaksi saja (jika ada lebih dari satu)
-    const selectedTransaction =
-      filteredData.length > 0 ? filteredData[0] : null;
-
     return res.status(200).json({
       success: true,
-      message: selectedTransaction
-        ? "Matching transaction found"
-        : "No matching transaction found in Midtrans",
+      message: "Transaction found!",
       data: {
         transaction: existingTransaction,
         transactionItems: existingTransactionItems,
-        midtransData: selectedTransaction,
       },
     });
   } catch (error) {

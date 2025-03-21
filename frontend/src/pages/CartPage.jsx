@@ -16,7 +16,6 @@ export default function Cart() {
   const {
     setTransactionDetails,
     createTransaction,
-    paying,
     fetchTransaction,
     error,
     isLoading,
@@ -34,15 +33,6 @@ export default function Cart() {
       setTableCode("");
     }
   }, []);
-
-  const statusMapping = {
-    1: "Pending",
-    2: "Challenge by FDS",
-    3: "Success",
-    4: "Denied",
-    5: "Expired",
-    6: "Cancelled",
-  };
 
   const handleIncrement = (index) => {
     const updatedCart = [...cart];
@@ -122,29 +112,28 @@ export default function Cart() {
     pollingInterval.current = setInterval(async () => {
       try {
         const transactionData = await fetchTransaction(transaction_id);
-        if (!transactionData?.midtransData) return;
+        if (!transactionData?.data?.transaction) return;
 
-        const status = parseInt(transactionData.midtransData.status, 10);
-        if (status !== 1) {
+        const status = transactionData.data.transaction.status;
+        if (status !== "pending") {
           // Jika tidak lagi pending, hentikan polling
           clearInterval(pollingInterval.current);
           pollingInterval.current = null;
-          await paying(transaction_id, status);
           setTimeout(() => window.location.reload(), 1000);
 
-          const route = status === 3 ? "/payment-success" : "/payment-failed";
+          const route =
+            status === "completed" ? "/payment-success" : "/payment-failed";
           const statusMessage =
-            status === 3 ? "Payment successful!" : "Payment Failed!";
+            status === "completed" ? "Payment successful!" : "Payment Failed!";
           toast.success(statusMessage);
           navigate(route, {
             state: {
-              status: statusMapping[status] || "Unknown",
+              status: status || "Unknown",
               transaction_id,
-              amount: transactionData.transaction.total_amount,
-              items: transactionData.transactionItems,
+              amount: transactionData.data.transaction.total_amount,
+              items: transactionData.data.transactionItems,
             },
           });
-          // setTimeout(() => window.location.reload(), 1000);
         }
       } catch (error) {
         console.error("Error fetching transaction:", error);

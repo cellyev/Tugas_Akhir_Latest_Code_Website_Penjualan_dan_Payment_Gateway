@@ -82,47 +82,6 @@ export const useTransactionStore = create((set, get) => ({
     }
   },
 
-  paying: async (transaction_id, status) => {
-    set({ isLoading: true, error: null });
-
-    try {
-      if (!transaction_id || !status) {
-        throw new Error("Transaction ID and status are required!");
-      }
-
-      const response = await axios.put(
-        `${API_URL}/${transaction_id}/payment/${status}`
-      );
-
-      if (!response?.data) {
-        throw new Error("Invalid response format");
-      }
-
-      const { success, message, data, items } = response.data;
-
-      if (!success) {
-        throw new Error(message || "Failed to update transaction");
-      }
-
-      set({
-        transactionDetails: data,
-        items: items || [],
-        isLoading: false,
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error("Error in paying API: ", error); // Tambahkan log untuk lebih jelas
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Error processing payment";
-      toast.error(errorMessage);
-      set({ error: errorMessage, isLoading: false });
-      throw error;
-    }
-  },
-
   fetchTransaction: async (transaction_id) => {
     set({ isLoading: true, error: null });
 
@@ -134,13 +93,13 @@ export const useTransactionStore = create((set, get) => ({
       const response = await axios.get(`${API_URL}/id/${transaction_id}`);
 
       if (!response?.data) {
-        throw new Error("Invalid response format");
+        throw new Error("Invalid response format!");
       }
 
       const { success, data, message } = response.data;
 
       if (!success) {
-        throw new Error(message || "Failed to fetch transactions");
+        throw new Error(message || "Failed to fetch transactions!");
       }
 
       set({ transactions: data, isLoading: false });
@@ -168,13 +127,13 @@ export const useTransactionStore = create((set, get) => ({
 
       const response = await axios.get(`${API_URL}/status/${status}`);
       if (!response?.data) {
-        throw new Error("Invalid response format");
+        throw new Error("Invalid response format!");
       }
 
       const { success, message, data } = response.data;
 
       if (!success) {
-        throw new Error(message || "Failed to fetch transactions");
+        throw new Error(message || "Failed to fetch transactions!");
       }
 
       set({
@@ -191,7 +150,6 @@ export const useTransactionStore = create((set, get) => ({
         "Error fetching transactions";
       toast.error(errorMessage);
       set({ error: errorMessage, isLoading: false });
-      // throw error;
     }
   },
 }));
