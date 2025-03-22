@@ -105,15 +105,6 @@ exports.sendSuccessEmail = async (customer_email, transaction, items) => {
   try {
     const emailResponse = await transporter.sendMail(mailOptions);
     console.log("Success Payment Email sent successfully.");
-
-    const emailLog = new EmailLogs({
-      transaction_id: transaction._id,
-      customer_email: customer_email,
-      email_link: emailResponse.response,
-    });
-
-    await emailLog.save();
-    console.log("Email log saved successfully.");
   } catch (error) {
     console.log("Failed to send verification email:", error);
     throw error;
