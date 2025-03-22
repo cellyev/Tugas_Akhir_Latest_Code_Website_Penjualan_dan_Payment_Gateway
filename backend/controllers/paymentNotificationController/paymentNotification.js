@@ -73,18 +73,18 @@ exports.payment_notification = async (req, res) => {
         Promise.all([
           emailPayload === "Success Transaction"
             ? sendSuccessEmail(
-                existingTransaction.customer_email,
-                existingTransaction,
-                items
+                transaction.customer_email,
+                transaction,
+                transaction_items
               )
             : sendFailedEmail(
-                existingTransaction.customer_email,
-                existingTransaction,
-                items
+                transaction.customer_email,
+                transaction,
+                transaction_items
               ),
           new EmailLogs({
             transaction_id,
-            customer_email: existingTransaction.customer_email,
+            customer_email: transaction.customer_email,
             payload: emailPayload,
           }).save(),
         ]).catch((err) => console.error("Email sending/logging failed:", err));
