@@ -51,17 +51,58 @@ exports.payment_notification = async (req, res) => {
       });
     }
 
+    // Konversi status Midtrans ke status yang diizinkan dalam database
+    let databaseStatus;
+    switch (transaction_status) {
+      case "settlement":
+      case "capture":
+        databaseStatus = "completed";
+        break;
+      case "pending":
+        databaseStatus = "pending";
+        break;
+      case "cancel":
+      case "refund":
+        databaseStatus = "cancelled";
+        break;
+      case "expire":
+        databaseStatus = "expired";
+        break;
+      case "deny":
+        databaseStatus = "denied";
+        break;
+      case "challenge":
+        databaseStatus = "challengebyFDS";
+        break;
+      default:
+        databaseStatus = "pending";
+        break;
+    }
+
+    // Perbarui status transaksi
+    transaction.status = databaseStatus;
+
     // Simpan perubahan status transaksi
     await transaction.save();
 
-    // Kirim email hanya jika transaksi sukses atau gagal
+    // Tentukan apakah perlu mengirim email
     let emailPayload = null;
-    if (transaction_status === "settlement") {
+    if (databaseStatus === "completed") {
       emailPayload = "Success Transaction";
-    } else {
+    } else if (
+      databaseStatus === "cancelled" ||
+      databaseStatus === "expired" ||
+      databaseStatus === "denied"
+    ) {
       emailPayload = "Fail Transaction";
     }
 
+    // Log proses email untuk debugging
+    console.log("Midtrans Status:", transaction_status);
+    console.log("Database Status:", databaseStatus);
+    console.log("Email Payload:", emailPayload);
+
+    // Kirim email jika emailPayload sudah ditentukan
     if (emailPayload) {
       const emailExists = await EmailLogs.findOne({
         transaction_id,
@@ -69,26 +110,38 @@ exports.payment_notification = async (req, res) => {
       });
 
       if (!emailExists) {
-        // Kirim email & simpan log secara paralel
-        Promise.all([
-          emailPayload === "Success Transaction"
-            ? sendSuccessEmail(
-                transaction.customer_email,
-                transaction,
-                transaction_items
-              )
-            : sendFailedEmail(
-                transaction.customer_email,
-                transaction,
-                transaction_items
-              ),
-          new EmailLogs({
-            transaction_id,
-            customer_email: transaction.customer_email,
-            payload: emailPayload,
-          }).save(),
-        ]).catch((err) => console.error("Email sending/logging failed:", err));
+        try {
+          await Promise.all([
+            emailPayload === "Success Transaction"
+              ? sendSuccessEmail(
+                  transaction.customer_email,
+                  transaction,
+                  transaction_items
+                )
+              : sendFailedEmail(
+                  transaction.customer_email,
+                  transaction,
+                  transaction_items
+                ),
+            new EmailLogs({
+              transaction_id,
+              customer_email: transaction.customer_email,
+              payload: emailPayload,
+            }).save(),
+          ]);
+          console.log(
+            `Email ${emailPayload} berhasil dikirim ke ${transaction.customer_email}`
+          );
+        } catch (err) {
+          console.error("Email sending/logging failed:", err);
+        }
+      } else {
+        console.log(`Email ${emailPayload} sudah pernah dikirim sebelumnya`);
       }
+    } else {
+      console.log(
+        `Email tidak dikirim karena status transaksi database: ${databaseStatus}`
+      );
     }
 
     return res.status(200).json({
