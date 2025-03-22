@@ -51,66 +51,44 @@ exports.payment_notification = async (req, res) => {
       });
     }
 
-    // Tentukan email_payload berdasarkan transaction_status
-    let email_payload = "Unknown Transaction Status"; // Nilai default
-
-    if (transaction_status === "settlement") {
-      transaction.status === "completed";
-      email_payload = "Success Transaction";
-    } else if (transaction_status === "pending") {
-      transaction.status = transaction_status;
-      email_payload = "Pending Transaction";
-    } else if (
-      transaction_status === "cancel" ||
-      transaction_status === "expire"
-    ) {
-      transaction.status = transaction_status;
-      email_payload = "Fail Transaction";
-    }
-
     // Simpan perubahan status transaksi
     await transaction.save();
 
-    // Kirim email hanya jika transaksi sukses, gagal, atau pending
-    if (email_payload && transaction.customer_email) {
-      const email_exists = await EmailLogs.findOne({
+    // Kirim email hanya jika transaksi sukses atau gagal
+    let emailPayload = null;
+    if (transaction_status === "settlement") {
+      emailPayload = "Success Transaction";
+    } else {
+      emailPayload = "Fail Transaction";
+    }
+
+    if (emailPayload) {
+      const emailExists = await EmailLogs.findOne({
         transaction_id,
-        payload: email_payload,
+        payload: emailPayload,
       });
 
-      if (!email_exists) {
-        console.log("Mengirim email notifikasi...");
-
+      if (!emailExists) {
         // Kirim email & simpan log secara paralel
-        await Promise.allSettled([
-          email_payload === "Success Transaction"
+        Promise.all([
+          emailPayload === "Success Transaction"
             ? sendSuccessEmail(
-                transaction.customer_email,
-                transaction,
-                transaction_items
+                existingTransaction.customer_email,
+                existingTransaction,
+                items
               )
             : sendFailedEmail(
-                transaction.customer_email,
-                transaction,
-                transaction_items
+                existingTransaction.customer_email,
+                existingTransaction,
+                items
               ),
           new EmailLogs({
             transaction_id,
-            customer_email: transaction.customer_email,
-            payload: email_payload,
+            customer_email: existingTransaction.customer_email,
+            payload: emailPayload,
           }).save(),
-        ]);
-
-        console.log("Email berhasil dikirim & log disimpan.");
-      } else {
-        console.log(
-          "Email sudah pernah dikirim sebelumnya, tidak dikirim ulang."
-        );
+        ]).catch((err) => console.error("Email sending/logging failed:", err));
       }
-    } else {
-      console.log(
-        "Tidak ada email yang dikirim karena email_payload kosong atau email pelanggan tidak tersedia."
-      );
     }
 
     return res.status(200).json({
