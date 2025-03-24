@@ -9,6 +9,7 @@ const {
   getById,
   getAllTransactionByStatus,
   getTransactionBySuccessAndIsRead,
+  getLatestCompletedAndIsReadTrueTransaction,
 } = require("../controllers/transactionController/getTransactionController");
 const {
   updateTransactionIsRead,
@@ -25,6 +26,11 @@ router.get("/id/:transaction_id", getById);
 
 // Use verify Token
 router.get("/status/:status", verifyToken, isAdmin, getAllTransactionByStatus);
+
+router.get(
+  "/latest-transaction-completed-isread-true",
+  getLatestCompletedAndIsReadTrueTransaction
+);
 
 router.get(
   "/get-transaction-succes-and-is-read",

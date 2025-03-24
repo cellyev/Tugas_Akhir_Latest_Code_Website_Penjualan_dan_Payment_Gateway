@@ -173,3 +173,34 @@ exports.getTransactionBySuccessAndIsRead = async (req, res) => {
     });
   }
 };
+
+exports.getLatestCompletedAndIsReadTrueTransaction = async (req, res) => {
+  try {
+    const latestTransaction = await Transactions.find({
+      status: "completed",
+      isRead: true,
+    })
+      .sort({ createdAt: -1 }) // Ambil transaksi terbaru
+      .limit(1);
+
+    if (!latestTransaction) {
+      return res.status(404).json({
+        success: false,
+        message: "No completed and read transactions found!",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Latest completed and read transaction found!",
+      data: latestTransaction,
+    });
+  } catch (error) {
+    console.error("Error fetching latest transaction:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An internal server error occurred!",
+      error: error.message,
+    });
+  }
+};
