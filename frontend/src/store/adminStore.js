@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import axios from "axios";
 
-// const API_URL = "http://localhost:8000/api/v1/admin";
-const API_URL = "https://vailovent.my.id/api/v1/admin";
+const API_URL = "http://localhost:8000/api/v1/admin";
+// const API_URL = "https://vailovent.my.id/api/v1/admin";
 
 export const useAdminStore = create((set) => ({
   error: null,

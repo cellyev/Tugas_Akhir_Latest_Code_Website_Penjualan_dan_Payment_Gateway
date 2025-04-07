@@ -1,6 +1,6 @@
-const axios = require("axios");
 const Transactions = require("../../models/transactionSchema");
 const TransactionItems = require("../../models/transactionItemSchema");
+const Products = require("../../models/productSchema");
 const mongoose = require("mongoose");
 
 exports.getById = async (req, res) => {
@@ -59,6 +59,7 @@ exports.getAllTransactionByStatus = async (req, res) => {
   }
 
   try {
+    // Get transactions with the specified status, sorted by creation date
     const transactions = await Transactions.find({ status }).sort({
       createdAt: -1,
     });
@@ -67,28 +68,60 @@ exports.getAllTransactionByStatus = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: `No transactions found with status '${status}'`,
-        data: [],
+        data: {
+          transactions: [],
+          transactionItems: [],
+          productDetails: [],
+        },
       });
     }
+
+    // Get all transaction items for these transactions
     const transactionItems = await TransactionItems.find({
-      transaction_id: {
-        $in: transactions.map((transaction) => transaction.id),
-      },
+      transaction_id: { $in: transactions.map((t) => t._id) },
     });
-    if (!transactionItems) {
+
+    if (!transactionItems || transactionItems.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No transaction items found",
-        data: null,
+        message: "No transaction items found for these transactions",
+        data: {
+          transactions,
+          transactionItems: [],
+          productDetails: [],
+        },
       });
     }
+
+    // Get unique product IDs from transaction items
+    const productIds = [
+      ...new Set(transactionItems.map((item) => item.product_id)),
+    ];
+
+    // Get all product details in one query
+    const productDetails = await Products.find({
+      _id: { $in: productIds },
+    });
+
+    // Map products for easy lookup
+    const productsMap = productDetails.reduce((map, product) => {
+      map[product._id] = product;
+      return map;
+    }, {});
+
+    // Enhance transaction items with product details
+    const enhancedTransactionItems = transactionItems.map((item) => ({
+      ...item.toObject(),
+      productDetail: productsMap[item.product_id] || null,
+    }));
 
     return res.status(200).json({
       success: true,
       message: `Transactions with status '${status}' successfully retrieved`,
       data: {
-        Transactions: transactions,
-        TransactionItems: transactionItems,
+        transactions,
+        transactionItems: enhancedTransactionItems,
+        productDetails,
       },
     });
   } catch (error) {

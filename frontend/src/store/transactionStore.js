@@ -2,12 +2,12 @@ import { create } from "zustand";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const API_URL = "https://vailovent.my.id/api/v1/transactions";
-const MIDTRANS_URL =
-  "https://vailovent.my.id/api/v1/midtrans/create-transaction";
+// const API_URL = "https://vailovent.my.id/api/v1/transactions";
+// const MIDTRANS_URL =
+//   "https://vailovent.my.id/api/v1/midtrans/create-transaction";
 
-// const API_URL = "http://localhost:8000/api/v1/transactions";
-// const MIDTRANS_URL = "http://localhost:8000/api/v1/midtrans/create-transaction";
+const API_URL = "http://localhost:8000/api/v1/transactions";
+const MIDTRANS_URL = "http://localhost:8000/api/v1/midtrans/create-transaction";
 
 export const useTransactionStore = create((set, get) => ({
   table_code: "",
@@ -137,8 +137,9 @@ export const useTransactionStore = create((set, get) => ({
       }
 
       set({
-        transactions: data.Transactions,
-        transactionItems: data.TransactionItems,
+        transactions: data.transactions,
+        transactionItems: data.transactionItems,
+        productDetails: data.productDetails,
         isLoading: false,
       });
 
