@@ -25,14 +25,14 @@ exports.createProductValidator = Joi.object({
     "any.required": "Price is required!",
   }),
 
-  image: Joi.string()
-    .uri({ scheme: ["http", "https"] })
-    .regex(/\.(jpg|jpeg|png|gif)$/i)
-    .required()
-    .messages({
-      "string.uri": "Invalid image URL!",
-      "string.empty": "Image URL is required!",
-      "any.required": "Image URL is required!",
-      "string.pattern.base": "Image must be in JPG, JPEG, PNG, or GIF format!",
-    }),
+  // image: Joi.string()
+  //   .uri({ scheme: ["http", "https"] })
+  //   .regex(/\.(jpg|jpeg|png|gif)$/i)
+  //   .required()
+  //   .messages({
+  //     "string.uri": "Invalid image URL!",
+  //     "string.empty": "Image URL is required!",
+  //     "any.required": "Image URL is required!",
+  //     "string.pattern.base": "Image must be in JPG, JPEG, PNG, or GIF format!",
+  //   }),
 });

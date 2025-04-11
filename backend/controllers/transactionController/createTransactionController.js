@@ -108,7 +108,17 @@ exports.createTransaction = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error creating transaction:", error);
+    console.error("[DEBUG] Detailed error:", {
+      message: error.message,
+      stack: error.stack,
+      requestBody: req.body,
+      requestFile: req.file
+        ? {
+            originalname: req.file.originalname,
+            size: req.file.size,
+          }
+        : null,
+    });
     return res.status(500).json({
       success: false,
       message: "An internal server error occurred!",
