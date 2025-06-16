@@ -43,8 +43,8 @@ Repositori ini merupakan versi ke-8 atau akhir proyek, di dalamnya Anda akan men
 3. Sistem akan membuat **transaksi baru di backend** dan mengarahkan pengguna ke Midtrans Snap Page.
 4. Setelah pembayaran berhasil:
    - Midtrans akan mengirim notifikasi (`callback`) ke backend.
-   - Backend menyimpan status transaksi sebagai **PAID**.
-   - Backend mengirim sinyal (via API atau MQTT) ke perangkat **Soundbox Payment** untuk memutar suara notifikasi.
+   - Backend menyimpan status transaksi sebagai **Successfull**.
+   - Perangkat **Soundbox Payment** akan mendapatkan data transaksi dan akan bekerja sesuai dengan fungsinya.
 5. Admin dapat melihat histori transaksi, status, dan mengelola produk melalui dashboard.
 
 ---
