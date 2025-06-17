@@ -11,7 +11,7 @@ Repositori ini merupakan versi ke-8 atau akhir proyek, di dalamnya Anda akan men
 
 ### ⚛️ Frontend
 - **React.js** — Framework JavaScript modern untuk membangun antarmuka pengguna dinamis.
-- **TailwindCSS / Bootstrap** (jika digunakan) — Untuk styling yang cepat dan responsif.
+- **TailwindCSS** — Untuk styling yang cepat dan responsif.
 
 ### ⚙️ Backend
 - **Node.js & Express.js** — Server backend yang mengatur rute API, autentikasi, dan komunikasi dengan perangkat IoT.
