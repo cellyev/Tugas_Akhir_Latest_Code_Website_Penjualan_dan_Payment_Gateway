@@ -6,6 +6,8 @@ import SignInPage from "../pages/SignInPage";
 import ProtectedRoute from "../components/ProtectRoute";
 import PaymentStatus from "../pages/PaymentStatusPage";
 import ProductList from "../pages/ProductListPage";
+import TermsPage from "../pages/TermsPage";
+import PrivacyPage from "../pages/PrivacyPage";
 
 export default function RouterComponent() {
   return (
@@ -15,6 +17,10 @@ export default function RouterComponent() {
       <Route path="/cart" element={<CartPage />} />
       <Route path="/payment-status" element={<PaymentStatus />} />
       <Route path="/admin/signin" element={<SignInPage />} />
+
+      {/* Legal Pages — diperlukan oleh link di modal Terms & Conditions (CRITICAL-45) */}
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
 
       {/* Protected Admin Routes */}
       <Route path="/admin">
@@ -57,3 +63,4 @@ export default function RouterComponent() {
     </Routes>
   );
 }
+

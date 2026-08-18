@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import axios from "axios";
 
-const API_URL = "http://localhost:8000/api/v1/auth";
-// const API_URL = "https://api-vailovent.vercel.app/api/v1/auth";
+// URL production — authStore sebelumnya salah menunjuk ke localhost
+const API_URL = "https://api-vailovent.vercel.app/api/v1/auth";
 
 axios.defaults.withCredentials = true;
 
@@ -27,7 +27,7 @@ export const useAuthStore = create((set) => ({
       });
     } catch (error) {
       set({
-        error: error.response.data.message || "Error signing in",
+        error: error.response?.data?.message || "Error signing in",
         isLoading: false,
       });
       throw error;
@@ -45,10 +45,33 @@ export const useAuthStore = create((set) => ({
       });
     } catch (error) {
       set({
-        error: error.response.data.message || "Error signing out",
+        error: error.response?.data?.message || "Error signing out",
         isLoading: false,
       });
       throw error;
     }
   },
+
+  // Digunakan oleh ProtectRoute untuk memverifikasi sesi admin.
+  // Memanggil GET /auth/me — cookie httpOnly dikirim otomatis oleh browser.
+  checkAuth: async () => {
+    set({ isCheckingAuth: true });
+    try {
+      const response = await axios.get(`${API_URL}/me`);
+      set({
+        user: response.data.data,
+        isAuthenticated: true,
+        isCheckingAuth: false,
+      });
+      return true;
+    } catch {
+      set({
+        user: null,
+        isAuthenticated: false,
+        isCheckingAuth: false,
+      });
+      return false;
+    }
+  },
 }));
+

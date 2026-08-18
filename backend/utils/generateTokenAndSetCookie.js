@@ -7,29 +7,15 @@ exports.generateTokenAndSetCookie = (res, userId, username) => {
       username,
     },
     process.env.JWT_SECRET_KEY,
-    { expiresIn: "7d" }
+    { expiresIn: "1d" }
   );
 
-  // Jika sudah production
-  // res.cookie("Authorization", token, {
-  //   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-  //   httpOnly: process.env.NODE_ENV === "production",
-  //   secure: process.env.NODE_ENV === "production",
-  //   sameSite: "strict",
-  // });
-
-  // Jika masih development
-  // res.cookie("Authorization", token, {
-  //   path: "/",
-  //   expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 hari
-  //   httpOnly: false, // Jangan httpOnly di mode development agar bisa diakses dari frontend
-  //   secure: false, // Jangan secure di mode development agar bisa berjalan di http (bukan https)
-  //   sameSite: "lax", // Agar cookie bisa digunakan dengan frontend berbeda origin
-  // });
-
+  // httpOnly: true — JavaScript di browser tidak bisa membaca cookie ini,
+  // mencegah pencurian token via serangan XSS.
+  // Cookie tetap dikirim otomatis oleh browser pada setiap request ke API.
   res.cookie("Authorization", token, {
     expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-    httpOnly: false,
+    httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   });

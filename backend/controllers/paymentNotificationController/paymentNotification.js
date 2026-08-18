@@ -1,6 +1,7 @@
 const Transactions = require("../../models/transactionSchema");
 const TransactionItems = require("../../models/transactionItemSchema");
 const EmailLogs = require("../../models/emailLogSchema");
+const crypto = require("crypto");
 const {
   sendSuccessEmail,
 } = require("../../middlewares/sendMail/sendSuccessEmail");
@@ -14,7 +15,38 @@ exports.payment_notification = async (req, res) => {
     const notification = req.body;
     console.log("Payment Notification:", notification);
 
-    const { transaction_status, order_id } = notification;
+    const {
+      transaction_status,
+      order_id,
+      status_code,
+      gross_amount,
+      signature_key,
+    } = notification;
+
+    // === CRITICAL-4: Verifikasi signature Midtrans ===
+    // SHA512(order_id + status_code + gross_amount + server_key)
+    const serverKey = process.env.MIDTRANS_SERVER_KEY;
+    if (!serverKey) {
+      console.error("MIDTRANS_SERVER_KEY is not set!");
+      return res.status(500).json({
+        success: false,
+        message: "Server configuration error.",
+      });
+    }
+
+    const expectedSignature = crypto
+      .createHash("sha512")
+      .update(`${order_id}${status_code}${gross_amount}${serverKey}`)
+      .digest("hex");
+
+    if (!signature_key || signature_key !== expectedSignature) {
+      console.warn("Invalid Midtrans signature. Possible spoofed request.");
+      return res.status(403).json({
+        success: false,
+        message: "Invalid signature.",
+      });
+    }
+    // === End signature verification ===
 
     // Validasi order_id sebelum melakukan split
     if (!order_id || !order_id.includes("-")) {
